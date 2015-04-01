@@ -9,11 +9,11 @@ namespace Seneka.Ebdys.TesseractOCR.Helper
 {
     public class ProcessCommand
     {
-        protected static void CommandExecute(string Arguments)
+        protected static void CommandExecute(string Arguments, string fileName = null)
         {
             Process p = new Process();
             ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName = "C:\\Tesseract\\tesseract.exe";
+            info.FileName = fileName != null ? fileName : "C:\\Tesseract\\tesseract.exe";
             info.UseShellExecute = false;
             info.RedirectStandardError = true;
             info.RedirectStandardOutput = true;
