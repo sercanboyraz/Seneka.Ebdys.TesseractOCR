@@ -9,18 +9,16 @@ namespace Seneka.Ebdys.TesseractOCR.Helper
 {
     public class ProcessCommand
     {
-        protected static void CommandExecute(string Arguments, string fileName = null)
+        public static bool CommandExecute(string Arguments)
         {
             Process p = new Process();
             ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName = fileName != null ? fileName : "C:\\Tesseract\\tesseract.exe";
+            info.FileName = Properties.Settings.Default.HelperDatas;
             info.UseShellExecute = false;
             info.RedirectStandardError = true;
             info.RedirectStandardOutput = true;
             info.WindowStyle = ProcessWindowStyle.Hidden;
             info.CreateNoWindow = true;
-            //-t .75
-            //info.WorkingDirectory = @"C:\\Tesseract\\";
             info.Arguments = Arguments;
             p.StartInfo = info;
             try
@@ -31,7 +29,9 @@ namespace Seneka.Ebdys.TesseractOCR.Helper
             catch (Exception x)
             {
                 Debug.WriteLine(x.Message);
+                return false;
             }
+            return true;
         }
     }
 }

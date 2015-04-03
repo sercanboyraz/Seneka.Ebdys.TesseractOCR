@@ -21,10 +21,28 @@ namespace Seneka.Ebdys.TesseractOCR
 
         static void Main(string[] args)
         {
+            //////////////////////////////////////////////////////
+            ///set TESSDATA_PREFIC="C:\Tesseract\tessdata"  ----------->bunu unutma client da önce bu satır çalışacak.
+            ///////////////////////////////////////////////////////
             log4net.Config.XmlConfigurator.Configure();
             ConnectionString = Properties.Settings.Default.ConnectionString.ToString();
+            MyProperty();
             Start();
         }
+
+        public static void MyProperty()
+        {
+            var gggg = new string[] { "1.pdf" };
+            foreach (var item in gggg)
+            {
+                var newTifData = GhostScriptTiffConverter.GhostScriptTiffConverterProcess(@"E:\" + item);
+                if (!string.IsNullOrWhiteSpace(newTifData))
+                    Ocr(newTifData);
+                else
+                    log.Error(newTifData + " no tiff data");
+            }
+        }
+
 
         public static void Start()
         {
@@ -35,13 +53,13 @@ namespace Seneka.Ebdys.TesseractOCR
                 {
                     Conn.Open();
                     var dsDocumentDatas = new DataSet();
-                    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("SELECT TOP 10 Id, DocumentDataTypeEnum, DataType, DocumentId,Data FROM DocumentData WITH (NOLOCK) WHERE Id NOT IN (SELECT DocumentDataId FROM DocumentOcr WITH (NOLOCK)) AND DataType = 'pdf' ORDER BY Id desc", Conn))
+                    using (System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("SELECT TOP 5 Id, DocumentDataTypeEnum, DataType, DocumentId,Data FROM DocumentData WITH (NOLOCK) WHERE Id NOT IN (SELECT DocumentDataId FROM DocumentOcr WITH (NOLOCK)) AND DataType = 'pdf' ORDER BY Id asc", Conn))
                     {
                         using (System.Data.SqlClient.SqlDataAdapter adapter = new System.Data.SqlClient.SqlDataAdapter(command))
                         {
                             adapter.Fill(dsDocumentDatas);
                             //şimdilik data çekilip yazılıyor düzeltilecek.
-                            for (int i = 0; i < 100; i++)
+                            for (int i = 0; i < 5; i++)
                             {
                                 DataRow rowToProcess = dsDocumentDatas.Tables[0].Rows[i];
                                 var path = Properties.Settings.Default.DocumentData;
@@ -49,8 +67,8 @@ namespace Seneka.Ebdys.TesseractOCR
                                 var fullOrjinalPath = path + documentName;
                                 try
                                 {
-                                    System.IO.File.WriteAllBytes(path + documentName, (byte[])rowToProcess["Data"]);
-                                    var newTifData = TiffConverter(fullOrjinalPath);
+                                    System.IO.File.WriteAllBytes(fullOrjinalPath, (byte[])rowToProcess["Data"]);
+                                    var newTifData = GhostScriptTiffConverter.GhostScriptTiffConverterProcess(fullOrjinalPath);
                                     if (!string.IsNullOrWhiteSpace(newTifData))
                                         Ocr(newTifData);
                                     else
@@ -73,12 +91,10 @@ namespace Seneka.Ebdys.TesseractOCR
             var newPath = path;
             try
             {
-                var command = string.Concat("\"" + path + "\"" + " \"" + newPath.Replace(".tif", "") + "\"" + " pdf");
+                var command = string.Concat("-l \"tur\" \"" + path + "\"" + " \"" + newPath.Replace(".tif", "") + "\"" + " pdf");
                 var ocrResult = OCRExecute(command);
                 if (ocrResult == false)
-                {
                     log.Error(newPath);
-                }
                 else
                     log.Info(newPath);
             }
@@ -88,43 +104,20 @@ namespace Seneka.Ebdys.TesseractOCR
             }
         }
 
-        private static string TiffConverter(string path)
-        {
-            var newPath = path;
-            try
-            {
-                var command = string.Concat("-dNOPAUSE -q -r300 -sDEVICE=tiffgray -dBATCH -dFirstPage=1 -dLastPage=1 -sOutputFile=\"" + newPath.Replace(".pdf", ".tif") + "\" \"" + newPath + "\" -c quit");
-                var ocrResult = OCRExecute(command, Properties.Settings.Default.HelperDatas+ "\\gs915\\bin\\gswin64c.exe");
-                if (ocrResult == false)
-                {
-                    log.Error(path);
-                    return "";
-                }
-                else
-                    log.Info(path);
-            }
-            catch (Exception ex)
-            {
-                log.Error("TiffConverter01" + Environment.NewLine + ex);
-                return "";
-            }
-            return newPath.Replace(".pdf", ".tif");
-        }
-
-        public static bool OCRExecute(string command, string processName = null)
+        private static bool OCRExecute(string command)
         {
             bool result = false;
             try
             {
-                if (processName == null)
-                    CommandExecute(command);
+                var ocrPdf = CommandExecute(command);
+                if (ocrPdf == true)
+                    result = true;
                 else
-                    CommandExecute(command, processName);
-                result = true;
+                    result = false;
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                log.Error("OCRExecute" + Environment.NewLine + ex);
                 result = true;
             }
             return result;

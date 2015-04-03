@@ -35,7 +35,7 @@ namespace Seneka.Ebdys.TesseractOCR.Properties {
 
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Tesseract\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\Tesseract\\")]
         public string HelperDatas
         {
             get
