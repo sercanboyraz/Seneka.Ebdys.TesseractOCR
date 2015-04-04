@@ -26,16 +26,17 @@ namespace Seneka.Ebdys.TesseractOCR
             ///////////////////////////////////////////////////////
             log4net.Config.XmlConfigurator.Configure();
             ConnectionString = Properties.Settings.Default.ConnectionString.ToString();
+            TempData.Instance.CleanAll();
             MyProperty();
-            Start();
+            //Start();
         }
 
         public static void MyProperty()
         {
-            var gggg = new string[] { "1.pdf" };
+            var gggg = new string[] { "1.pdf", "2.pdf", "3.pdf", "4.pdf" };
             foreach (var item in gggg)
             {
-                var newTifData = GhostScriptTiffConverter.GhostScriptTiffConverterProcess(@"E:\" + item);
+                var newTifData = GhostScriptTiffConverter.GhostScriptTiffConverterProcess(@"D:\TestBelgeleri\" + item);
                 if (!string.IsNullOrWhiteSpace(newTifData))
                     Ocr(newTifData);
                 else
@@ -91,7 +92,7 @@ namespace Seneka.Ebdys.TesseractOCR
             var newPath = path;
             try
             {
-                var command = string.Concat("-l \"tur\" \"" + path + "\"" + " \"" + newPath.Replace(".tif", "") + "\"" + " pdf");
+                var command = string.Concat("-l \"tur\" \"" + path + "\"" + " \"" + newPath.Replace(".tif", "convert") + "\"" + " pdf");
                 var ocrResult = OCRExecute(command);
                 if (ocrResult == false)
                     log.Error(newPath);

@@ -14,13 +14,14 @@ namespace Seneka.Ebdys.TesseractOCR.Helper
             Process p = new Process();
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = Properties.Settings.Default.HelperDatas;
-            info.UseShellExecute = false;
             info.RedirectStandardError = true;
             info.RedirectStandardOutput = true;
             info.WindowStyle = ProcessWindowStyle.Hidden;
             info.CreateNoWindow = true;
+            info.UseShellExecute = false;
             info.Arguments = Arguments;
             p.StartInfo = info;
+            p.Start();
             try
             {
                 p.Start();
