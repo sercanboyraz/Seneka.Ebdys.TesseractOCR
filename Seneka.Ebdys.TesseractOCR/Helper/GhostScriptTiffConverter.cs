@@ -493,7 +493,7 @@ namespace Seneka.Ebdys.TesseractOCR.Helper
                 GhostscriptWrapper.GenerateOutput(dataPdf, dataPdf.Replace(".pdf", ".tif"),
                 new GhostscriptSettings
                 {
-                    Device = GhostscriptDevices.tiffpack,
+                    Device = GhostscriptDevices.tiffgray,
                     Page = new GhostscriptPages
                     {
                         AllPages = true

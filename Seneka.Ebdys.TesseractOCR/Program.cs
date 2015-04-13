@@ -33,10 +33,10 @@ namespace Seneka.Ebdys.TesseractOCR
 
         public static void MyProperty()
         {
-            var gggg = new string[] { "1.pdf", "2.pdf", "3.pdf", "4.pdf" };
+            var gggg = new string[] { "1.pdf"};
             foreach (var item in gggg)
             {
-                var newTifData = GhostScriptTiffConverter.GhostScriptTiffConverterProcess(@"D:\TestBelgeleri\" + item);
+                var newTifData = GhostScriptTiffConverter.GhostScriptTiffConverterProcess(@"D:\" + item);
                 if (!string.IsNullOrWhiteSpace(newTifData))
                     Ocr(newTifData);
                 else
